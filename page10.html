@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag-and-Drop Pairing Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Pixelify Sans', sans-serif;
+        }
+        .container {
+            width: 960px;
+            height: 540px;
+            background: #000 url('10.png') no-repeat center center; /* Background image for page 10 */
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .game-area {
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+            margin-top: 20px;
+        }
+        .draggable, .droppable {
+            padding: 20px; /* Increased padding for larger boxes */
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 2px solid #fffc00;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            font-size: 28px; /* Increased font size for larger boxes */
+        }
+        .droppable {
+            width: 200px; /* Increased width by 30% (from 150px) */
+            height: 70px; /* Increased height by 30% (from 50px) */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .draggable {
+            width: 200px; /* Increased width by 30% (from 150px) */
+            height: 70px; /* Increased height by 30% (from 50px) */
+            margin-bottom: 15px; /* Slightly increased margin for spacing */
+        }
+        .draggable.dragging {
+            opacity: 0.5;
+        }
+        .draggable.correct {
+            cursor: default; /* Disable dragging for correct pairs */
+            opacity: 0.5; /* Make it look inactive */
+        }
+        .droppable.hovered {
+            background-color: #6b6b6b;
+        }
+        .droppable.correct {
+            background-color: green;
+            cursor: default; /* Disable interaction for correct pairs */
+        }
+        .droppable.incorrect {
+            background-color: red;
+        }
+        .continue-box {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease, opacity 0.5s ease, visibility 0.5s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .continue-box.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .continue-box:hover {
+            background-color: #6b6b6b;
+        }
+        .continue-text {
+            font-size: 24px;
+            color: white;
+            text-align: center;
+        }
+        .info-box {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #007bff; /* Blue background */
+            padding: 15px 30px;
+            border-radius: 10px;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .info-box.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Highlight specific words in the info box */
+        .info-box .highlight {
+            color: #fffc00; /* Yellow color for specific words */
+            font-weight: bold; /* Optional: Make the highlighted words bold */
+        }
+        @media screen and (max-width: 960px), 
+               screen and (max-height: 540px) {
+            .container {
+                width: 100vw;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+        <!-- Audio Element -->
+        <audio id="background-audio" loop>
+            <source src="SB019-10_Deep In My Mind_Kyan Laslett OBrien_Sneaky Biscuit Ltd.wav" type="wav">
+            Your browser does not support the audio element.
+        </audio>
+    
+    <div class="container">
+        <!-- Drag-and-Drop Game Area -->
+        <div class="game-area" id="draggable-area">
+            <!-- Draggable Items -->
+            <div class="draggable" draggable="true" data-target="drop1">📧</div> <!-- Email emoji -->
+            <div class="draggable" draggable="true" data-target="drop2">🛍</div> <!-- Shopping emoji -->
+            <div class="draggable" draggable="true" data-target="drop3">🙎</div> <!-- Face ID emoji -->
+        </div>
+        <div class="game-area" id="droppable-area">
+            <!-- Droppable Targets -->
+            <div class="droppable" id="drop1">Email</div> <!-- Updated target for email -->
+            <div class="droppable" id="drop2">Online Shopping</div>
+            <div class="droppable" id="drop3">Face ID</div>
+        </div>
+
+        <!-- Info Box (Hidden by default) -->
+        <div class="info-box" id="info-box"></div>
+
+        <!-- Continue Box -->
+        <div class="continue-box" tabindex="0" aria-label="Continue to the next page">
+            <div class="continue-text">CONTINUE</div>
+        </div>
+    </div>
+
+    <script>
+        // Function to shuffle an array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Randomize the positions of draggable and droppable boxes
+        function randomizePositions() {
+            const draggableArea = document.getElementById('draggable-area');
+            const droppableArea = document.getElementById('droppable-area');
+
+            // Convert NodeLists to arrays
+            const draggables = Array.from(draggableArea.children);
+            const droppables = Array.from(droppableArea.children);
+
+            // Shuffle the arrays
+            shuffleArray(draggables);
+            shuffleArray(droppables);
+
+            // Append the shuffled elements back to their containers
+            draggables.forEach(draggable => draggableArea.appendChild(draggable));
+            droppables.forEach(droppable => droppableArea.appendChild(droppable));
+        }
+
+        // Call the function to randomize positions on page load
+        randomizePositions();
+
+        // Drag-and-Drop Logic
+        const draggables = document.querySelectorAll('.draggable');
+        const droppables = document.querySelectorAll('.droppable');
+        const continueBox = document.querySelector('.continue-box');
+        const infoBox = document.getElementById('info-box');
+
+        // Map of correct pair messages with highlighted words
+        const pairMessages = {
+            drop1: '<span class="highlight">Email Spam Filter</span>: The model in the spam filter is trained with datasets of labelled emails. Over time, it learns which emails are spam and which are legitimate.',
+            drop2: '<span class="highlight">Online Shopping</span>: Algorithms analyze your shopping behavior to recommend products you might like, making your shopping experience more personalized.',
+            drop3: '<span class="highlight">Face ID</span>: Facial recognition technology is used to securely unlock your device by analyzing and matching your facial features.'
+        };
+
+        // Disable drag-and-drop functionality
+        function disableDragAndDrop() {
+            draggables.forEach(draggable => {
+                draggable.setAttribute('draggable', 'false');
+                draggable.style.pointerEvents = 'none';
+            });
+            droppables.forEach(droppable => {
+                droppable.style.pointerEvents = 'none';
+            });
+        }
+
+        // Enable drag-and-drop functionality
+        function enableDragAndDrop() {
+            draggables.forEach(draggable => {
+                if (!draggable.classList.contains('correct')) {
+                    draggable.setAttribute('draggable', 'true');
+                    draggable.style.pointerEvents = 'auto';
+                }
+            });
+            droppables.forEach(droppable => {
+                if (!droppable.classList.contains('correct')) {
+                    droppable.style.pointerEvents = 'auto';
+                }
+            });
+        }
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => {
+                if (!draggable.classList.contains('correct')) {
+                    draggable.classList.add('dragging');
+                }
+            });
+
+            draggable.addEventListener('dragend', () => {
+                draggable.classList.remove('dragging');
+            });
+        });
+
+        droppables.forEach(droppable => {
+            droppable.addEventListener('dragover', e => {
+                e.preventDefault();
+                if (!droppable.classList.contains('correct')) {
+                    droppable.classList.add('hovered');
+                }
+            });
+
+            droppable.addEventListener('dragleave', () => {
+                droppable.classList.remove('hovered');
+            });
+
+            droppable.addEventListener('drop', () => {
+                const draggable = document.querySelector('.dragging');
+                if (!draggable || droppable.classList.contains('correct')) return; // Prevent interaction with correct pairs
+
+                const targetId = draggable.getAttribute('data-target');
+
+                if (droppable.id === targetId) {
+                    // Correct pair
+                    droppable.classList.remove('incorrect');
+                    droppable.classList.add('correct');
+                    droppable.textContent = `${draggable.textContent} ✔️`;
+
+                    // Disable the draggable item
+                    draggable.classList.add('correct');
+                    draggable.setAttribute('draggable', 'false');
+
+                    // Show the info box with the corresponding message
+                    infoBox.innerHTML = pairMessages[targetId]; // Use innerHTML to render the span
+                    infoBox.classList.add('visible');
+
+                    // Disable drag-and-drop functionality while the info box is visible
+                    disableDragAndDrop();
+
+                    // Hide the info box after 5 seconds and re-enable drag-and-drop
+                    setTimeout(() => {
+                        infoBox.classList.remove('visible');
+                        enableDragAndDrop(); // Re-enable drag-and-drop functionality
+                        checkCompletion(); // Check if all pairs are correct
+                    }, 5000); // 5 seconds
+                } else {
+                    // Incorrect pair
+                    droppable.classList.add('incorrect');
+                }
+
+                droppable.classList.remove('hovered');
+            });
+        });
+
+        // Check if all pairs are correct
+        function checkCompletion() {
+            const correctPairs = document.querySelectorAll('.droppable.correct').length;
+            console.log(`Correct pairs: ${correctPairs}`); // Debugging
+            if (correctPairs === droppables.length) {
+                console.log('All pairs matched!'); // Debugging
+                continueBox.classList.add('visible'); // Show the "CONTINUE" button
+            }
+        }
+
+        // Continue Box Logic
+        continueBox.addEventListener('click', function() {
+            window.location.href = 'file:///Users/aisyahnur/Desktop/intdes/page11.html'; // Replace with the URL of your next page
+        });
+
+        continueBox.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                continueBox.click();
+            }
+        });
+    </script>
+</body>
+</html>

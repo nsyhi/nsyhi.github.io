@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Dimension Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 960px;
+            height: 540px;
+            background: #000 url('1.png') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            cursor: pointer; /* Indicates the container is clickable */
+        }
+        .game-start {
+            font-family: 'Pixelify Sans', sans-serif;
+            font-size: clamp(40px, 6.5vw, 60px); /* Responsive font size */
+            color: #fffc00;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #fffc00;
+            display: inline-block;
+            width: 0;
+            animation: typing 2s steps(12, end) forwards, blink 0.7s infinite;
+            position: absolute;
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Perfect centering */
+        }
+        .continue-text {
+            font-family: 'Pixelify Sans', sans-serif;
+            font-size: calc(clamp(40px, 6.5vw, 60px) * 0.4); /* 40% of "GAME START" font size */
+            color: white;
+            text-align: center;
+            position: absolute;
+            top: calc(50% + 40px); /* Position below "GAME START" */
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            opacity: 0; /* Initially hidden */
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .container.active .continue-text {
+            opacity: 1; /* Make it visible */
+            visibility: visible;
+        }
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 330px; } /* Adjusted width for "GAME START" and larger font size */
+        }
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+        @media screen and (max-width: 960px), 
+               screen and (max-height: 540px) {
+            .container {
+                width: 100vw;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio Element -->
+    <audio id="background-audio" loop>
+        <source src="SB019-10_Deep In My Mind_Kyan Laslett OBrien_Sneaky Biscuit Ltd.wav" type="wav">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="container" tabindex="0" aria-label="Click anywhere to continue to the next page">
+        <!-- Game Start Section -->
+        <div class="game-start" aria-label="GAME START">GAME START</div>
+
+        <!-- Continue Text Section -->
+        <div class="continue-text">CLICK ANYWHERE TO CONTINUE</div>
+    </div>
+
+    <script>
+        const container = document.querySelector('.container');
+        const continueText = document.querySelector('.continue-text');
+        const audio = document.getElementById('background-audio');
+
+        // Play audio automatically when the page loads
+        window.addEventListener('load', function() {
+            audio.play().catch(error => {
+                console.error("Audio playback failed:", error);
+            });
+        });
+
+        // Add click event to redirect to the next page
+        container.addEventListener('click', function() {
+            window.location.href = 'file:///Users/aisyahnur/Desktop/intdes/page2.html';
+        });
+
+        // Add keyboard support (Enter or Space to trigger click)
+        container.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                container.click();
+            }
+        });
+
+        // Show "CLICK ANYWHERE TO CONTINUE" after the typing animation ends
+        setTimeout(() => {
+            container.classList.add('active');
+        }, 2000); // Match the duration of the typing animation
+    </script>
+</body>
+</html>

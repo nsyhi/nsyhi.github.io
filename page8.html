@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 960px;
+            height: 540px;
+            background: #000 url('8.png') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .flip-box {
+            position: absolute;
+            left: calc(20px + 45%);
+            top: 50%;
+            transform: translateY(-50%);
+            width: 448px;
+            height: 224px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+        .flip-box-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-box.flipped .flip-box-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-box-front, .flip-box-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Pixelify Sans', sans-serif;
+            font-size: 18px;
+            color: white;
+            border-radius: 25px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: left;
+        }
+        .flip-box-back {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: rotateY(180deg);
+        }
+        .continue-box {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: opacity 0.5s ease, visibility 0.5s ease, background-color 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .continue-box.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .continue-box:hover {
+            background-color: #6b6b6b;
+        }
+        .continue-text {
+            font-family: 'Pixelify Sans', sans-serif;
+            font-size: 24px;
+            color: white;
+            text-align: center;
+        }
+        @media screen and (max-width: 960px),
+               screen and (max-height: 540px) {
+            .container {
+                width: 100vw;
+                height: 100vh;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .flip-box {
+                width: 300px;
+                height: 150px;
+                left: calc(10px + 40%);
+            }
+            .flip-box-front, .flip-box-back {
+                font-size: 14px;
+            }
+            .continue-box {
+                padding: 10px 20px;
+            }
+            .continue-text {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+        <!-- Audio Element -->
+        <audio id="background-audio" loop>
+            <source src="SB019-10_Deep In My Mind_Kyan Laslett OBrien_Sneaky Biscuit Ltd.wav" type="wav">
+            Your browser does not support the audio element.
+        </audio>
+    
+    <div class="container">
+        <div class="flip-box" tabindex="0" aria-label="Click to flip and learn about artificial intelligence">
+            <div class="flip-box-inner">
+                <div class="flip-box-front">Click here to find out!</div>
+                <div class="flip-box-back">
+                    Artificial intelligence (AI) is the science of teaching machines to mimic intelligent human behaviours. AI systems are taught and trained using computer programming that learns and adapts.
+                </div>
+            </div>
+        </div>
+
+        <div class="continue-box" tabindex="0" aria-label="Continue to the next page">
+            <div class="continue-text">CONTINUE</div>
+        </div>
+    </div>
+
+    <script>
+        const flipBox = document.querySelector('.flip-box');
+        const continueBox = document.querySelector('.continue-box');
+
+        flipBox.addEventListener('click', function() {
+            flipBox.style.pointerEvents = 'none';
+            flipBox.classList.toggle('flipped');
+
+            setTimeout(() => {
+                continueBox.classList.add('visible');
+            }, 300);
+        });
+
+        flipBox.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                flipBox.click();
+            }
+        });
+
+        continueBox.addEventListener('click', function() {
+            window.location.href = 'file:///Users/aisyahnur/Desktop/intdes/page9.html';
+        });
+
+        continueBox.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                continueBox.click();
+            }
+        });
+    </script>
+</body>
+</html>

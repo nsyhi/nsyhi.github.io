@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fifth Page</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Press Start 2P', cursive;
+        }
+        .container {
+            width: 100%;
+            max-width: 960px;
+            height: 100%;
+            max-height: 540px;
+            background: #000 url('16.png') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            position: relative;
+            padding: 20px;
+        }
+        .quiz-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-size: 24px;
+            color: #fffc00;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+        .options button {
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            width: 100%;
+            border: none;
+        }
+        .options button:nth-child(1) { background-color: #ff6f61; color: white; }
+        .options button:nth-child(2) { background-color: #6b5b95; color: white; }
+        .options button:nth-child(3) { background-color: #88b04b; color: white; }
+        .options button:nth-child(4) { background-color: #ffa500; color: white; }
+        .options button:hover:not(:disabled) {
+            filter: brightness(1.2);
+        }
+        .feedback {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #fffc00;
+        }
+        #next-button {
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fffc00;
+            border: 2px solid #fffc00;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            margin-top: 20px;
+        }
+        #next-button.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Media Queries for Responsive Design */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .quiz-container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+            .question {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+            .options button {
+                font-size: 12px;
+                padding: 8px;
+            }
+            .feedback {
+                font-size: 14px;
+            }
+            #next-button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 18px;
+            }
+            .question {
+                font-size: 14px;
+            }
+            .options button {
+                font-size: 12px;
+                padding: 6px;
+            }
+            .feedback {
+                font-size: 12px;
+            }
+            #next-button {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+        <!-- Audio Element -->
+        <audio id="background-audio" loop>
+            <source src="SB019-10_Deep In My Mind_Kyan Laslett OBrien_Sneaky Biscuit Ltd.wav" type="wav">
+            Your browser does not support the audio element.
+        </audio>
+    
+    <div class="container">
+        <div class="quiz-container">
+            <h1>Quiz Mini-Game</h1>
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <div class="feedback" id="feedback"></div>
+            <button id="next-button" onclick="nextQuestion()">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { question: "What does AI stand for?", options: ["Artificial Intelligence", "Automated Inference", "Advanced Integration", "Algorithmic Intelligence"], answer: "Artificial Intelligence" },
+            { question: "What does Gen AI specialise in?", options: ["Analyzing existing data", "Creating new content", "Optimizing hardware performance", "Detecting anomalies in systems"], answer: "Creating new content" },
+            { question: "What makes a good prompt?", options: ["Length, Complexity, Tone, Speed, Accuracy", "Persona, Task, Audience, Context, Format", "Grammar, Vocabulary, Punctuation, Clarity, Creativity", "Data, Algorithms, Models, Training, Feedback"], answer: "Persona, Task, Audience, Context, Format" }
+        ];
+
+        let currentQuestionIndex = 0;
+
+        // Load the current question
+        function loadQuestion() {
+            const questionElement = document.getElementById("question");
+            const optionsElement = document.getElementById("options");
+            const feedbackElement = document.getElementById("feedback");
+            const nextButton = document.getElementById("next-button");
+            
+            const currentQuestion = questions[currentQuestionIndex];
+            questionElement.textContent = currentQuestion.question;
+            optionsElement.innerHTML = "";
+            
+            // Create buttons for each option
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option);
+                optionsElement.appendChild(button);
+            });
+
+            feedbackElement.textContent = "";
+            nextButton.classList.remove("visible");
+        }
+
+        // Check if the selected answer is correct
+        function checkAnswer(selectedOption) {
+            const currentQuestion = questions[currentQuestionIndex];
+            const buttons = document.querySelectorAll(".options button");
+            
+            // Disable all buttons and highlight correct/incorrect answers
+            buttons.forEach(button => {
+                button.disabled = true;
+                if (button.textContent === currentQuestion.answer) {
+                    button.style.borderColor = "#88b04b"; // Green for correct answer
+                } else if (button.textContent === selectedOption) {
+                    button.style.borderColor = "#ff6f61"; // Red for incorrect answer
+                }
+            });
+
+            // Display feedback
+            document.getElementById("feedback").textContent = selectedOption === currentQuestion.answer ? "Correct! 🎉" : `Incorrect! The correct answer is ${currentQuestion.answer}.`;
+            document.getElementById("next-button").classList.add("visible");
+        }
+
+        // Move to the next question or redirect to the next page
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion(); // Load the next question
+            } else {
+                // Redirect to the next page after the quiz is completed
+                window.location.href = "file:///Users/aisyahnur/Desktop/intdes/page17.html"; // Replace with your next page URL
+            }
+        }
+
+        // Load the first question when the page loads
+        loadQuestion();
+    </script>
+</body>
+</html>

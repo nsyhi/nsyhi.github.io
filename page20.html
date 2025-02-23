@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fifth Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 960px;
+            height: 540px;
+            background: #000 url('20.png') no-repeat center center; /* New background image */
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .continue-box {
+            position: absolute;
+            bottom: 20px; /* Position near the bottom */
+            right: 20px; /* Position near the right */
+            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+            padding: 15px 30px; /* Padding inside the box */
+            border-radius: 10px; /* Rounded edges */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer; /* Indicates the box is clickable */
+            transition: background-color 0.3s ease, opacity 0.5s ease, visibility 0.5s ease; /* Smooth transitions */
+            opacity: 0; /* Initially hidden */
+            visibility: hidden;
+        }
+        .continue-box.visible {
+            opacity: 1; /* Make it visible */
+            visibility: visible;
+        }
+        .continue-box:hover {
+            background-color: #6b6b6b; /* Hover color (#6b6b6b) */
+        }
+        .continue-text {
+            font-family: 'Pixelify Sans', sans-serif;
+            font-size: 24px; /* Medium-sized font */
+            color: white; /* White text */
+            text-align: center;
+        }
+        @media screen and (max-width: 960px), 
+               screen and (max-height: 540px) {
+            .container {
+                width: 100vw;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+        <!-- Audio Element -->
+        <audio id="background-audio" loop>
+            <source src="SB019-10_Deep In My Mind_Kyan Laslett OBrien_Sneaky Biscuit Ltd.wav" type="wav">
+            Your browser does not support the audio element.
+        </audio>
+    
+    <div class="container">
+        <!-- Continue Box -->
+        <div class="continue-box" tabindex="0" aria-label="Continue to the next page">
+            <div class="continue-text">CONTINUE</div>
+        </div>
+    </div>
+
+    <script>
+        const continueBox = document.querySelector('.continue-box');
+
+        // Show the "CONTINUE" box after a short delay
+        setTimeout(() => {
+            continueBox.classList.add('visible');
+        }, 500); // Delay to allow the page to load
+
+        // Add click event to redirect to the next page
+        continueBox.addEventListener('click', function() {
+            window.location.href = 'file:///Users/aisyahnur/Desktop/intdes/page21.html';
+        });
+
+        // Add keyboard support (Enter or Space to trigger click)
+        continueBox.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                continueBox.click();
+            }
+        });
+    </script>
+</body>
+</html>
